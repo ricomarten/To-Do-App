@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import { auth } from '../firebase';
 
@@ -15,7 +16,7 @@ const SignOut = () => {
 
   return (
     <div>
-      <button onClick={signOut}>Sign Out</button>
+      <button className="rounded bg-slate-600 p-1" onClick={signOut}>Sign Out</button>
     </div>
   );
 };

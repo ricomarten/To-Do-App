@@ -13,22 +13,38 @@ const SignIn = () => {
   const SignInGoogle = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
+        //const token = credential.accessToken;
+        // The signed-in user info.
+        //const user = result.user;
+        //alert(JSON.stringify(user))
         localStorage.setItem("user",JSON.stringify(result))
         window.location.reload(false)
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
       }).catch((error) => {
+        // Handle Errors here.
+        //const errorCode = error.code;
         const errorMessage = error.message;
+        // The email of the user's account used.
+        //const email = error.customData.email;
+        // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
         alert(errorMessage)
       });
     }
   const signIn = async () => {
     try {
+       //signInWithEmailAndPassword(email, password);
        await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
+        // Signed in 
         console.log(userCredential.user);
         localStorage.setItem("user",JSON.stringify(userCredential))
         window.location.reload(false)
+        // ...
       })
       .catch((error) => {
         console.log(error.code);
@@ -75,7 +91,7 @@ const SignIn = () => {
                                   <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">Remember me</label>
                                 </div>
                             </div>
-                            <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot password?</a>
+                            <a href="/signup" className="text-sm font-medium  text-slate-900 hover:underline dark:text-primary-500">Signup</a>
                         </div>
                         <button  onClick={signIn}  className="w-full text-white bg-slate-800 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign in</button>
                         <button  onClick={SignInGoogle}  className="w-full text-white bg-slate-800 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign in Google</button>

@@ -1,5 +1,4 @@
 import requests
-import pyrebase
 
 firebase_config={
     "apiKey": "AIzaSyBbDPSCSER7kkgAV0bEDZmHWSZymlKjHUg",
@@ -10,5 +9,3 @@ firebase_config={
     "appId": "1:781201600864:web:81ee4647f5c60499aeee05",
     "measurementId": "G-7LD1FM7V1N"
 }
-
-firebase=pyrebase.initialize_app(firebase_config)
