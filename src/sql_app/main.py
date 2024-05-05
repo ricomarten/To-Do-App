@@ -85,3 +85,15 @@ def update_book(book_id: int, book: BookCreate):
         return {"id": book_id, **book.dict()}
     else:
         raise HTTPException(status_code=404, detail="Book not found")
+    
+@app.delete("/books/{book_id}")
+def delete_book(book_id: int):
+    connection = create_connection()
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM books WHERE id=?', (book_id,))
+    connection.commit()
+    connection.close()
+    if cursor.rowcount > 0:
+        return {"id": book_id}
+    else:
+        raise HTTPException(status_code=404, detail="Book not found")
