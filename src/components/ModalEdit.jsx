@@ -6,6 +6,7 @@ import "../styles/modal.css";
 
 Modal.setAppElement('#root');
 
+// eslint-disable-next-line react/prop-types
 const ModalEdit = ({ isOpen, closeModal, taskId, task }) => {
   const [editedTask, setEditedTask] = useState(task);
 
@@ -39,7 +40,7 @@ const ModalEdit = ({ isOpen, closeModal, taskId, task }) => {
     <div>
       
     <h2 className="text-2xl text-slate-700 font-bold mb-4">Edit Task</h2>
-      <label className="block text-slate-700 mb-2">Old Task: { JSON.stringify(task) ? task.title : ''}</label>
+      <label className="block text-slate-700 mb-2">Old Task: { JSON.stringify(task) ? JSON.stringify(task).title : ''}</label>
       <input
         type="text"
         value={editedTask}
@@ -59,7 +60,6 @@ const ModalEdit = ({ isOpen, closeModal, taskId, task }) => {
         Cancel
       </button>
     </div>
-      run dev
     </Modal>
   );
 };

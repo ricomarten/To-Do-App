@@ -1,50 +1,44 @@
 
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import axios from 'axios';
 import "../App.css";
-import { query, orderBy, onSnapshot } from "firebase/firestore";
-import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import SignIn from "../components/SignIn";
-import { db } from "../firebase";
-import { auth } from "../firebase";
 import ModalEdit from "../components/ModalEdit";
 
-function App() {
-  const user = auth.currentUser;
+function AppFast() {
+  
   if (localStorage.getItem("user") === null) {
     var getuser = false;
   } else {
     getuser = JSON.parse(localStorage.getItem("user"));
   }
+  
   useEffect(() => {
-    const q = query(collection(db, "tasks"), orderBy("created", "desc"));
-    onSnapshot(q, (querySnapshot) => {
-      setTodos(
-        querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          data: doc.data(),
-        }))
-      );
-    });
+    fetchTodos();
   }, []);
-
   const [todos, setTodos] = useState([]);
+  const fetchTodos = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/task/');
+      setTodos(response.data);
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error fetching todos:', error);
+    }
+  };
+
+  
   const [newItem, setNewItem] = useState("");
   const [filter, setFilter] = useState("all");
   const [isEditing, setIsEditing] = useState(null);
   const [editText, setEditText] = useState("");
   const [checked, setChecked] = useState();
-  const imageUrl = getuser ? getuser.user.photoURL : "";
-
-  const [openAddModal] = useState([]);
-  const [tasks, setTasks] = useState([]);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState({});
   const openEditModal = (task) => {
     setSelectedTask(task);
-    //alert(JSON.stringify(task))
     setEditModalOpen(true);
   };
   const closeEditModal = () => {
@@ -59,9 +53,9 @@ function App() {
     console.log("Filtering todos:", filter);
     switch (filter) {
       case "completed":
-        return todos.filter((todo) => todo.data.completed);
+        return todos.filter((todo) => todo.completed.toLowerCase());
       case "uncompleted":
-        return todos.filter((todo) => !todo.data.completed);
+        return todos.filter((todo) => !todo.completed.toLowerCase());
       default:
         return todos;
     }
@@ -70,12 +64,7 @@ function App() {
   const handleAddTodo = async (e) => {
     e.preventDefault();
     try {
-      await addDoc(collection(db, "tasks"), {
-        title: newItem,
-        description: newItem,
-        completed: false,
-        created: Timestamp.now(),
-      });
+      
       alert("Success");
     } catch (err) {
       alert(err);
@@ -83,33 +72,16 @@ function App() {
   };
 
   const handleToggleCompletion = (id) => {
-    //const updatedTodos = todos.map((todo) =>
-    //todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo);
     setIsEditing(id);
     setEditText(todos.find((todo) => todo.id === id).text);
-    const todoDocRef = doc(db, "tasks", id);
-    try {
-      updateDoc(todoDocRef, {
-        completed: !todos.find((todo) => todo.id === id).data.completed,
-      });
-    } catch (err) {
-      alert(err);
-    }
+    
     //setTodos(updatedTodos);
     //console.log(updatedTodos);
   };
   const handleDeleteTodo = (id) => {
     //setTodos(todos.filter((todo) => todo.id !== id));
-    const todoDocRef = doc(db, "tasks", id);
-    try {
-      deleteDoc(todoDocRef);
-      alert("Success Delete");
-    } catch (err) {
-      alert(err);
-    }
+   
   };
-
-  const handleEditTodo = (id) => {};
 
   const handleSaveEdit = (id) => {
     if (!editText.trim()) {
@@ -132,7 +104,7 @@ function App() {
         <div>
           <div className="app bg-gray-600 min-h-screen flex flex-col justify-center items-center">
             <div className="text-lg">Hello, {getuser.user.displayName}!</div>
-            <h1>To Do App with Firebase</h1>    
+            <h1>To Do App with FastAPI</h1>    
             <form
               onSubmit={handleAddTodo}
               className="new-item-form bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
@@ -185,6 +157,7 @@ function App() {
               </button>
             </div>
             <h1 className="header text-2xl font-bold underline">Todo List</h1>
+            
             <ul>
               {getFilteredTodos().map((todo) => (
                 <li
@@ -193,7 +166,7 @@ function App() {
                     todo.isCompleted ? "line-through" : ""
                   } bg-white flex items-center shadow-lg mb-2 p-4 rounded decoration-red-900`}
                 >
-                  {isEditing === todo.data.completed ? (
+                  {isEditing === todo.completed.toLowerCase() ? (
                     <div className="edit-form flex">
                       <input
                         type="text"
@@ -220,10 +193,10 @@ function App() {
                         <input
                           type="checkbox"
                           className="todo-checkbox mr-2"
-                          checked={todo.data.completed}
+                          checked={todo.completed.toLowerCase()}
                           onChange={() => handleToggleCompletion(todo.id)}
                         />
-                        <span className="text-gray-950">{todo.data.title}</span>
+                        <span className="text-gray-950">{todo.title}</span>
                       </label>
                       <div>
                         <button
@@ -261,4 +234,4 @@ function App() {
     </>
   );
 }
-export default App;
+export default AppFast;

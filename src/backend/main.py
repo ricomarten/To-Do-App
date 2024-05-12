@@ -4,10 +4,21 @@ from typing import List
 import sqlite3
 
 from fastapi import FastAPI,HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
 from pydantic import BaseModel
 
 app = FastAPI() 
-
+origins = [
+    "*",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class TaskCreate(BaseModel):
     title: str
     description: str
@@ -46,11 +57,11 @@ create_table() # Call this function to create the table
 
 
 @app.get( "/" ) 
-def  read_root (): 
+async def  read_root (): 
     return { "message" : "Selamat datang di CRUD API" }
 
 @app.post("/task/")
-def create_task_endpoint(task: TaskCreate):
+async def create_task_endpoint(task: TaskCreate):
     task_id = create_task(task)
     return {"id": task_id, **task.dict()}
 
