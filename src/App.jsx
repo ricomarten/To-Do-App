@@ -6,11 +6,11 @@ import Routes from './routes';
 import Navbar from "./components/Navbar";
 
 export default function App() {
-
   return (
     <>
 
       <div>
+        
         <Navbar></Navbar>
         <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
           <div className="container">

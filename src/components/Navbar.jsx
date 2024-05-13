@@ -1,8 +1,8 @@
 import SignOut from "../components/SignOut";
-if (localStorage.getItem("user") === null) {
+if (sessionStorage.getItem("user") === null) {
     var getuser = false;
 } else {
-    getuser = JSON.parse(localStorage.getItem("user"));
+    getuser = JSON.parse(sessionStorage.getItem("user"));
 }
 const Navbar =() =>{
     return(

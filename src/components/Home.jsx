@@ -9,15 +9,21 @@ import SignIn from "../components/SignIn";
 import { db } from "../firebase";
 import { auth } from "../firebase";
 import ModalEdit from "../components/ModalEdit";
+import { CookiesProvider, useCookies } from 'react-cookie'
 
 function App() {
+  
   const user = auth.currentUser;
-  if (localStorage.getItem("user") === null) {
+  if (sessionStorage.getItem("user") === null) {
     var getuser = false;
   } else {
-    getuser = JSON.parse(localStorage.getItem("user"));
+    getuser = JSON.parse(sessionStorage.getItem("user"));
+    console.log(getuser)
+    document.cookie = "username="+getuser.user.email+"; path=/";
   }
+  
   useEffect(() => {
+
     const q = query(collection(db, "tasks"), orderBy("created", "desc"));
     onSnapshot(q, (querySnapshot) => {
       setTodos(
@@ -124,9 +130,9 @@ function App() {
   };
 
   return (
-    <>
+    <CookiesProvider>
       {getuser ? (
-        <div>
+        <div >
           <div className="app bg-gray-600 min-h-screen flex flex-col justify-center items-center">
             <div className="text-lg">Hello, {getuser.user.displayName}!</div>
             <h1>To Do App with Firebase</h1>    
@@ -255,7 +261,7 @@ function App() {
         <SignIn />
         </>
       )}
-    </>
+    </CookiesProvider>
   );
 }
 export default App;

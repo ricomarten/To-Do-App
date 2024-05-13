@@ -6,16 +6,18 @@ import SignIn from "../components/SignIn";
 import ModalEdit from "../components/ModalEdit";
 
 function AppFast() {
-    if (localStorage.getItem("user") === null) {
+    if (sessionStorage.getItem("user") === null) {
         var getuser = false;
     } else {
-        getuser = JSON.parse(localStorage.getItem("user"));
+        getuser = JSON.parse(sessionStorage.getItem("user"));
+        document.cookie = "username="+getuser.user.email+"; path=/";
     }
     const endPoint="http://127.0.0.1:8000/task/"
     useEffect(() => {
         fetchTodos();
     }, []);
     const [todos, setTodos] = useState([]);
+    const [selectedTodo, setSelectedTodo] = useState(null);
     
     const fetchTodos = async () => {
         try {
@@ -26,6 +28,7 @@ function AppFast() {
         console.error("Error fetching todos:", error);
         }
   }; 
+  
     const deleteTodo = async (id) => {
         try {
             await axios.delete(endPoint+id);
@@ -48,6 +51,34 @@ function AppFast() {
         } catch (err) {
           alert('Error adding todo:', err);
         }
+    };
+
+    const getTodoById = async (id) => {
+      try {
+        const response = await axios.get(endPoint+id);
+        setSelectedTodo(response.data);
+      } catch (error) {
+        console.error('Error fetching todo by ID:', error);
+      }
+    };
+    const handleToggleCompletion = async (id) => {
+      getTodoById(id)
+      console.log(selectedTodo)
+      try {
+          //await axios.put(endPoint+id);
+          setTodos(todos.filter(todo => todo.id !== id));
+          //const response = await axios.put(endPoint+id, 
+          //  {   title: newItem,
+          //      description: newItem,
+          //      completed: "false"
+          //  }
+        //x);
+        alert("Success");
+      } catch (error) {
+          console.error('Error Editing todo:', error);
+      }
+     
+  
     };
   const [newItem, setNewItem] = useState("");
   const [filter, setFilter] = useState("all");
@@ -75,22 +106,13 @@ function AppFast() {
         console.log(todos)
         return todos.filter((todo) => JSON.parse(todo.completed.toLowerCase()));
       case "uncompleted":
-        return todos.filter((todo) => !!todo.completed.toLowerCase());
+        return todos.filter((todo) => !JSON.parse(todo.completed.toLowerCase()));
       default:
         return todos;
     }
   };
 
   
-
-  const handleToggleCompletion = (id) => {
-    setIsEditing(id);
-    setEditText(todos.find((todo) => todo.id === id).text);
-
-  };
-  const handleDeleteTodo = (id) => {
-    //setTodos(todos.filter((todo) => todo.id !== id));
-  };
 
   const handleSaveEdit = (id) => {
     if (!editText.trim()) {
@@ -202,7 +224,7 @@ function AppFast() {
                         <input
                           type="checkbox"
                           className="todo-checkbox mr-2"
-                          checked={Boolean(todo.completed.toLowerCase()).valueOf()}
+                          checked={JSON.parse(todo.completed.toLowerCase())}
                           onChange={() => handleToggleCompletion(todo.id)}
                         />
                         <span className="text-gray-950">{todo.title}</span>

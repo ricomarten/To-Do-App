@@ -13,25 +13,12 @@ const SignIn = () => {
   const SignInGoogle = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
-        //const token = credential.accessToken;
-        // The signed-in user info.
-        //const user = result.user;
-        //alert(JSON.stringify(user))
-        localStorage.setItem("user",JSON.stringify(result))
+        sessionStorage.setItem("user",JSON.stringify(result))
         window.location.reload(false)
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
       }).catch((error) => {
-        // Handle Errors here.
-        //const errorCode = error.code;
         const errorMessage = error.message;
-        // The email of the user's account used.
-        //const email = error.customData.email;
-        // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
         alert(errorMessage)
       });
     }
@@ -40,11 +27,9 @@ const SignIn = () => {
        //signInWithEmailAndPassword(email, password);
        await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in 
         console.log(userCredential.user);
-        localStorage.setItem("user",JSON.stringify(userCredential))
+        sessionStorage.setItem("user",JSON.stringify(userCredential))
         window.location.reload(false)
-        // ...
       })
       .catch((error) => {
         console.log(error.code);
