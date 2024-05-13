@@ -1,39 +1,58 @@
-
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
+import axios from "axios";
 import "../App.css";
 import SignIn from "../components/SignIn";
 import ModalEdit from "../components/ModalEdit";
 
 function AppFast() {
-  
-  if (localStorage.getItem("user") === null) {
-    var getuser = false;
-  } else {
-    getuser = JSON.parse(localStorage.getItem("user"));
-  }
-  
-  useEffect(() => {
-    fetchTodos();
-  }, []);
-  const [todos, setTodos] = useState([]);
-  const fetchTodos = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:8000/task/');
-      setTodos(response.data);
-      console.log(response.data)
-    } catch (error) {
-      console.error('Error fetching todos:', error);
+    if (localStorage.getItem("user") === null) {
+        var getuser = false;
+    } else {
+        getuser = JSON.parse(localStorage.getItem("user"));
     }
-  };
-
-  
+    const endPoint="http://127.0.0.1:8000/task/"
+    useEffect(() => {
+        fetchTodos();
+    }, []);
+    const [todos, setTodos] = useState([]);
+    
+    const fetchTodos = async () => {
+        try {
+            const response = await axios.get(endPoint);
+            setTodos(response.data);
+            console.log(response.data);
+        } catch (error) {
+        console.error("Error fetching todos:", error);
+        }
+  }; 
+    const deleteTodo = async (id) => {
+        try {
+            await axios.delete(endPoint+id);
+            setTodos(todos.filter(todo => todo.id !== id));
+        } catch (error) {
+            console.error('Error deleting todo:', error);
+        }
+    };
+    const handleAddTodo = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(endPoint, 
+                {   title: newItem,
+                    description: newItem,
+                    completed: "false"
+                }
+            );
+          alert("Success");
+          fetchTodos();
+        } catch (err) {
+          alert('Error adding todo:', err);
+        }
+    };
   const [newItem, setNewItem] = useState("");
   const [filter, setFilter] = useState("all");
   const [isEditing, setIsEditing] = useState(null);
   const [editText, setEditText] = useState("");
-  const [checked, setChecked] = useState();
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState({});
@@ -53,34 +72,24 @@ function AppFast() {
     console.log("Filtering todos:", filter);
     switch (filter) {
       case "completed":
-        return todos.filter((todo) => todo.completed.toLowerCase());
+        console.log(todos)
+        return todos.filter((todo) => JSON.parse(todo.completed.toLowerCase()));
       case "uncompleted":
-        return todos.filter((todo) => !todo.completed.toLowerCase());
+        return todos.filter((todo) => !!todo.completed.toLowerCase());
       default:
         return todos;
     }
   };
 
-  const handleAddTodo = async (e) => {
-    e.preventDefault();
-    try {
-      
-      alert("Success");
-    } catch (err) {
-      alert(err);
-    }
-  };
+  
 
   const handleToggleCompletion = (id) => {
     setIsEditing(id);
     setEditText(todos.find((todo) => todo.id === id).text);
-    
-    //setTodos(updatedTodos);
-    //console.log(updatedTodos);
+
   };
   const handleDeleteTodo = (id) => {
     //setTodos(todos.filter((todo) => todo.id !== id));
-   
   };
 
   const handleSaveEdit = (id) => {
@@ -104,7 +113,7 @@ function AppFast() {
         <div>
           <div className="app bg-gray-600 min-h-screen flex flex-col justify-center items-center">
             <div className="text-lg">Hello, {getuser.user.displayName}!</div>
-            <h1>To Do App with FastAPI</h1>    
+            <h1>To Do App with FastAPI</h1>
             <form
               onSubmit={handleAddTodo}
               className="new-item-form bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
@@ -157,7 +166,7 @@ function AppFast() {
               </button>
             </div>
             <h1 className="header text-2xl font-bold underline">Todo List</h1>
-            
+
             <ul>
               {getFilteredTodos().map((todo) => (
                 <li
@@ -193,7 +202,7 @@ function AppFast() {
                         <input
                           type="checkbox"
                           className="todo-checkbox mr-2"
-                          checked={todo.completed.toLowerCase()}
+                          checked={Boolean(todo.completed.toLowerCase()).valueOf()}
                           onChange={() => handleToggleCompletion(todo.id)}
                         />
                         <span className="text-gray-950">{todo.title}</span>
@@ -208,7 +217,7 @@ function AppFast() {
 
                         <button
                           className="btn-danger bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded-r"
-                          onClick={() => handleDeleteTodo(todo.id)}
+                          onClick={() => deleteTodo(todo.id)}
                         >
                           Delete
                         </button>
@@ -218,6 +227,7 @@ function AppFast() {
                 </li>
               ))}
             </ul>
+            
             <ModalEdit
               isOpen={editModalOpen}
               closeModal={closeEditModal}
@@ -228,7 +238,7 @@ function AppFast() {
         </div>
       ) : (
         <>
-        <SignIn />
+          <SignIn />
         </>
       )}
     </>

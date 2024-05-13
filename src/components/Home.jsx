@@ -44,7 +44,6 @@ function App() {
   const [selectedTask, setSelectedTask] = useState({});
   const openEditModal = (task) => {
     setSelectedTask(task);
-    //alert(JSON.stringify(task))
     setEditModalOpen(true);
   };
   const closeEditModal = () => {
@@ -83,8 +82,6 @@ function App() {
   };
 
   const handleToggleCompletion = (id) => {
-    //const updatedTodos = todos.map((todo) =>
-    //todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo);
     setIsEditing(id);
     setEditText(todos.find((todo) => todo.id === id).text);
     const todoDocRef = doc(db, "tasks", id);
